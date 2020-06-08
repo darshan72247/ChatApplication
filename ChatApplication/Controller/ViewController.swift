@@ -7,16 +7,32 @@
 //
 
 import UIKit
+import Firebase
 
 class ViewController: UITableViewController {
 
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "logout", style: .plain, target: self, action: #selector(handleLogout))
         view.backgroundColor = .white
+        
+        if  Auth.auth().currentUser?.uid == nil{
+            perform(#selector(handleLogout), with: nil, afterDelay: 0)
+            handleLogout()
+        }
+        
     }
 
     @objc func handleLogout(){
+        
+        do{
+            try Auth.auth().signOut()
+        } catch let logouterror {
+            print(logouterror)
+        }
+        
         let loginController = LoginController()
         loginController.modalPresentationStyle = .fullScreen   // code for fullscrean view 
         present(loginController,animated:true,completion: nil)
