@@ -13,6 +13,8 @@ class LoginController: UIViewController {
     
     // data declared
     let db = Firestore.firestore()
+    // storge declared
+    let storage = Storage.storage()
     
     //MARK: - main login box closure
     let inputContainerView:  UIView = {
@@ -88,11 +90,13 @@ class LoginController: UIViewController {
     }()
     
     //MARK: - Login Image
-    let profileImageView: UIImageView = {
+    lazy var profileImageView: UIImageView = {
        let imageView = UIImageView()
         imageView.image = #imageLiteral(resourceName: "logo")
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileView)))
         return imageView
     }()
     
@@ -216,7 +220,8 @@ class LoginController: UIViewController {
     //MARK: - handleLogin register button onclick function and its sub part of register and login sub function
     // func for register button
     func handleRegister(){
-        guard let email = emailTextField.text , let password = passwordTextField.text ,let name = nameTextField.text else { fatalError("email or password value is null")
+       
+        guard let email = emailTextField.text , let password = passwordTextField.text ,let name = nameTextField.text  else { fatalError("email or password value is null")
         }
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
             
@@ -226,9 +231,28 @@ class LoginController: UIViewController {
             }
             
            //MARK: - saving data into cloud Storage
-            self.db.collection(K.FStore.collectionName).addDocument(data: [
-                K.FStore.nameField:name ,
-                K.FStore.emailField:email ])
+            
+            guard let uid = Auth.auth().currentUser?.uid else {
+                fatalError("Uid is still yet not generated")}
+            
+            let storageRef = self.storage.reference().child("myImage.png ")
+            
+            if let uploadData = self.profileImageView.image!.pngData(){
+                storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
+                    if error != nil{
+                        print(error!)
+                    } else {
+                        
+                        print(metadata)
+                    }
+                }
+            }
+            
+           
+            
+            self.db.collection(K.FStore.collectionName).document(uid).setData([
+            K.FStore.nameField:name ,
+            K.FStore.emailField:email ])
             { (error) in
                 if let e = error
                 {

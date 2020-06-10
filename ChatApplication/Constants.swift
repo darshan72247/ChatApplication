@@ -10,9 +10,11 @@ import Foundation
 
 struct K {
     
+    static let newMessageCellIdentifier = "cellId"
     struct FStore {
         static let collectionName = "users"
         static let nameField = "name"
         static let emailField = "email"
+        static let uidField = "uid"
     }
 }
