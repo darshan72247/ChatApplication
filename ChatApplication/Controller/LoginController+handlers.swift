@@ -27,7 +27,8 @@ extension LoginController : UIImagePickerControllerDelegate , UINavigationContro
     
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        print(info[.originalImage])
+        guard let image = info[.originalImage] else {return}
+        print(image)
         
         var selectedImageFromPicker:UIImage?
         

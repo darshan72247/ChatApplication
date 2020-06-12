@@ -11,6 +11,7 @@ import UIKit
 class User: NSObject {
     var name : String?
     var email : String?
+    var profileImageURL : String?
     
      init(username : String , useremail : String) {
         self.name = username

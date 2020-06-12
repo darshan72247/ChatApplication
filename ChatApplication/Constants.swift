@@ -16,5 +16,6 @@ struct K {
         static let nameField = "name"
         static let emailField = "email"
         static let uidField = "uid"
+        static let profileUrl = "profileImageUrl"
     }
 }

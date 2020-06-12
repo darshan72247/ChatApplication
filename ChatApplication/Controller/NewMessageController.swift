@@ -41,6 +41,7 @@ class NewMessageController: UITableViewController {
         let user = users[indexPath.row]
         cell.textLabel!.text = user.name
         cell.detailTextLabel?.text = user.email
+//        cell.imageView?.image = UIImage(named: "123")
         return cell
     }
     
@@ -58,7 +59,6 @@ class NewMessageController: UITableViewController {
                         if let name = data[K.FStore.nameField] as? String ,let email = data[K.FStore.emailField] as? String{
                             let user = User(username: name, useremail: email)
                             self.users.append(user)
-                            print(user.name , user.email)
                             
                             DispatchQueue.main.async {
                                 self.tableView.reloadData()

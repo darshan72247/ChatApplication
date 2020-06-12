@@ -93,6 +93,8 @@ class LoginController: UIViewController {
     lazy var profileImageView: UIImageView = {
        let imageView = UIImageView()
         imageView.image = #imageLiteral(resourceName: "logo")
+//        imageView.layer.cornerRadius = 45
+//        imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.isUserInteractionEnabled = true
@@ -220,7 +222,7 @@ class LoginController: UIViewController {
     //MARK: - handleLogin register button onclick function and its sub part of register and login sub function
     // func for register button
     func handleRegister(){
-       
+        
         guard let email = emailTextField.text , let password = passwordTextField.text ,let name = nameTextField.text  else { fatalError("email or password value is null")
         }
         Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
@@ -230,42 +232,49 @@ class LoginController: UIViewController {
                 return
             }
             
-           //MARK: - saving data into cloud Storage
+            //MARK: - saving data into cloud Storage
             
             guard let uid = Auth.auth().currentUser?.uid else {
                 fatalError("Uid is still yet not generated")}
-            
-            let storageRef = self.storage.reference().child("myImage.png ")
-            
-            if let uploadData = self.profileImageView.image!.pngData(){
+            let imageName = NSUUID().uuidString
+            let storageRef = self.storage.reference().child("profile_images").child("\(imageName).jpeg")
+            if let uploadData = self.profileImageView.image?.jpegData(compressionQuality: 0.1){
+                print("helllo")
                 storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
                     if error != nil{
                         print(error!)
                     } else {
+                        storageRef.downloadURL { (url, error) in
+                            if error != nil{
+                                print(error!)
+                            } else {
+                                print("Url Downloaded")
+                                guard let imageUrl = url?.absoluteString else {return}
+                                let values = [ K.FStore.nameField:name ,K.FStore.emailField:email ,K.FStore.profileUrl: imageUrl] as [String : Any]
+                                self.registerUserIntoDatabaseWithUID(uid: uid, values: values)
+                                
+                            }
+                        }
                         
-                        print(metadata)
                     }
                 }
+                
             }
-            
-           
-            
-            self.db.collection(K.FStore.collectionName).document(uid).setData([
-            K.FStore.nameField:name ,
-            K.FStore.emailField:email ])
-            { (error) in
-                if let e = error
-                {
-                    print("there was an issue regarding saving data to firestore ,\(e) " )
-                }
-                else
-                {
-                    print("succesfully saved data")
-                    self.dismiss(animated: true, completion: nil)
-                }
-            }
-            
         }
+    }
+    
+    private func registerUserIntoDatabaseWithUID(uid: String , values:[String:Any]){
+        self.db.collection(K.FStore.collectionName).document(uid).setData(values, completion: { (error) in
+            if let e = error
+            {
+                print("there was an issue regarding saving data to firestore ,\(e) " )
+            }
+            else
+            {
+                print("succesfully saved data")
+                self.dismiss(animated: true, completion: nil)
+            }
+        })
     }
     
     @objc func handleLoginRegister(){
