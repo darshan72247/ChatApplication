@@ -11,6 +11,7 @@ import Firebase
 
 class LoginController: UIViewController {
     
+    var messagesController : MessagesController?
     // data declared
     let db = Firestore.firestore()
     // storge declared
@@ -239,7 +240,6 @@ class LoginController: UIViewController {
             let imageName = NSUUID().uuidString
             let storageRef = self.storage.reference().child("profile_images").child("\(imageName).jpeg")
             if let uploadData = self.profileImageView.image?.jpegData(compressionQuality: 0.1){
-                print("helllo")
                 storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
                     if error != nil{
                         print(error!)
@@ -292,6 +292,7 @@ class LoginController: UIViewController {
                 print(error!)
             } else {
                 // succesufully loged in with email and password
+                self.messagesController?.fetchUserAndSetupnavBarTitle()
                 self.dismiss(animated: true, completion: nil)
             }
         }

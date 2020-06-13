@@ -30,20 +30,24 @@ class MessagesController: UITableViewController {
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
         } else {
             
-            let uid = Auth.auth().currentUser?.uid
-            db.collection(K.FStore.collectionName).getDocuments() { (snapshot, err) in
-                if let err = err {
-                    print("Error getting documents: \(err)")
-                } else {
-                    for doc in snapshot!.documents {
-                        let data = doc.data()
-                        if  uid == doc.documentID{
-                            self.navigationItem.title = data[K.FStore.nameField] as? String
-                        }
-                    }
-                }
-            }
+           fetchUserAndSetupnavBarTitle()
         }
+    }
+    
+    func fetchUserAndSetupnavBarTitle(){
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+                   db.collection(K.FStore.collectionName).getDocuments() { (snapshot, err) in
+                       if let err = err {
+                           print("Error getting documents: \(err)")
+                       } else {
+                           for doc in snapshot!.documents {
+                               let data = doc.data()
+                               if  uid == doc.documentID{
+                                   self.navigationItem.title = data[K.FStore.nameField] as? String
+                               }
+                           }
+                       }
+                   }
     }
 
     @objc func handleLogout(){
@@ -55,6 +59,7 @@ class MessagesController: UITableViewController {
         }
         
         let loginController = LoginController()
+        loginController.messagesController = self
         loginController.modalPresentationStyle = .fullScreen // code for fullscrean view
         present(loginController,animated:true,completion: nil)
     }
