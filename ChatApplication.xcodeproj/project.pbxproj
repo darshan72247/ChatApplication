@@ -19,6 +19,7 @@
 		CC797705248EAEED006ADDD2 /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC797704248EAEED006ADDD2 /* NewMessageController.swift */; };
 		CC861C882490337C00525073 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC861C872490337C00525073 /* User.swift */; };
 		CC861C8A249157CB00525073 /* LoginController+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC861C89249157CB00525073 /* LoginController+handlers.swift */; };
+		CC914CC7249735CF00CCB922 /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC914CC6249735CF00CCB922 /* ChatLogController.swift */; };
 		CCA300F5248CAF970032E7C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CCA300F4248CAF970032E7C7 /* GoogleService-Info.plist */; };
 		CCA300F7248D4FD10032E7C7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA300F6248D4FD10032E7C7 /* Constants.swift */; };
 		F875B5A6499A5DB3FABE5E14 /* Pods_ChatApplication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3844C4978CD5D5ABEDE99FC /* Pods_ChatApplication.framework */; };
@@ -42,6 +43,7 @@
 		CC797704248EAEED006ADDD2 /* NewMessageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
 		CC861C872490337C00525073 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		CC861C89249157CB00525073 /* LoginController+handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginController+handlers.swift"; sourceTree = "<group>"; };
+		CC914CC6249735CF00CCB922 /* ChatLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
 		CCA300F4248CAF970032E7C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CCA300F6248D4FD10032E7C7 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -118,6 +120,7 @@
 				CC741C1F248BF3810023A4B0 /* MessagesController.swift */,
 				CC797704248EAEED006ADDD2 /* NewMessageController.swift */,
 				CC861C89249157CB00525073 /* LoginController+handlers.swift */,
+				CC914CC6249735CF00CCB922 /* ChatLogController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -260,6 +263,7 @@
 				CC861C8A249157CB00525073 /* LoginController+handlers.swift in Sources */,
 				CC741C34248BFB140023A4B0 /* LoginController.swift in Sources */,
 				CC741C1C248BF3810023A4B0 /* AppDelegate.swift in Sources */,
+				CC914CC7249735CF00CCB922 /* ChatLogController.swift in Sources */,
 				CC3E90B924951077005DF64D /* Extension.swift in Sources */,
 				CC861C882490337C00525073 /* User.swift in Sources */,
 				CC797705248EAEED006ADDD2 /* NewMessageController.swift in Sources */,
@@ -410,6 +414,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4NMVJRPWQ9;
 				INFOPLIST_FILE = ChatApplication/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -428,6 +433,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4NMVJRPWQ9;
 				INFOPLIST_FILE = ChatApplication/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

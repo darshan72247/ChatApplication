@@ -43,11 +43,66 @@ class MessagesController: UITableViewController {
                            for doc in snapshot!.documents {
                                let data = doc.data()
                                if  uid == doc.documentID{
-                                   self.navigationItem.title = data[K.FStore.nameField] as? String
+                                self.setupNavBarWithUser(data: data)
+                                   //self.navigationItem.title = data[K.FStore.nameField] as? String
                                }
                            }
                        }
                    }
+    }
+    
+    func setupNavBarWithUser(data : [String : Any]){
+        let titleView = UIView()
+        titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
+        //titleView.backgroundColor = UIColor.red
+
+        let containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.addSubview(titleView)
+
+        containerView.centerXAnchor.constraint(equalTo: titleView.centerXAnchor).isActive = true
+        containerView.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
+        //containerView.backgroundColor = UIColor.yellow
+
+        let profileImageView = UIImageView()
+        if let profileImageUrl = data[K.FStore.profileUrl] as? String{
+            profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
+            profileImageView.contentMode = .scaleAspectFill
+            profileImageView.layer.cornerRadius = 20
+            profileImageView.clipsToBounds = true
+            profileImageView.translatesAutoresizingMaskIntoConstraints = false
+        }
+        titleView.addSubview(profileImageView)
+        //ios13 constraints
+        //x,y,height,width constraints
+        profileImageView.leftAnchor.constraint(equalTo: titleView.leftAnchor).isActive = true
+        profileImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+
+        let namelabel = UILabel()
+        titleView.addSubview(namelabel)
+        guard let name = data[K.FStore.nameField] as? String else { return }
+        namelabel.text = name
+        namelabel.translatesAutoresizingMaskIntoConstraints = false
+
+        namelabel.leftAnchor.constraint(equalTo: profileImageView.rightAnchor, constant: 8).isActive = true
+        namelabel.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
+        namelabel.rightAnchor.constraint(equalTo: titleView.rightAnchor).isActive = true
+        namelabel.heightAnchor.constraint(equalTo: profileImageView.heightAnchor).isActive = true
+
+
+        self.navigationItem.titleView = titleView
+        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
+    
+        
+        
+    }
+    
+    @objc func showChatController(){
+        print("123")
+        let chatLogController = ChatLogController()
+        navigationController?.pushViewController(chatLogController, animated: true)
     }
 
     @objc func handleLogout(){

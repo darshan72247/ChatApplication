@@ -150,7 +150,6 @@ class LoginController: UIViewController {
         inputsConatinerViewHeightAnchor = inputContainerView.heightAnchor.constraint(equalToConstant: 150)
         inputsConatinerViewHeightAnchor?.isActive = true
         
-        
        
         
         //MARK: - name constraints
@@ -220,83 +219,7 @@ class LoginController: UIViewController {
         
     }
     
-    //MARK: - handleLogin register button onclick function and its sub part of register and login sub function
-    // func for register button
-    func handleRegister(){
-        
-        guard let email = emailTextField.text , let password = passwordTextField.text ,let name = nameTextField.text  else { fatalError("email or password value is null")
-        }
-        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-            
-            if error != nil{
-                print("error")
-                return
-            }
-            
-            //MARK: - saving data into cloud Storage
-            
-            guard let uid = Auth.auth().currentUser?.uid else {
-                fatalError("Uid is still yet not generated")}
-            let imageName = NSUUID().uuidString
-            let storageRef = self.storage.reference().child("profile_images").child("\(imageName).jpeg")
-            if let uploadData = self.profileImageView.image?.jpegData(compressionQuality: 0.1){
-                storageRef.putData(uploadData, metadata: nil) { (metadata, error) in
-                    if error != nil{
-                        print(error!)
-                    } else {
-                        storageRef.downloadURL { (url, error) in
-                            if error != nil{
-                                print(error!)
-                            } else {
-                                print("Url Downloaded")
-                                guard let imageUrl = url?.absoluteString else {return}
-                                let values = [ K.FStore.nameField:name ,K.FStore.emailField:email ,K.FStore.profileUrl: imageUrl] as [String : Any]
-                                self.registerUserIntoDatabaseWithUID(uid: uid, values: values)
-                                
-                            }
-                        }
-                        
-                    }
-                }
-                
-            }
-        }
-    }
     
-    private func registerUserIntoDatabaseWithUID(uid: String , values:[String:Any]){
-        self.db.collection(K.FStore.collectionName).document(uid).setData(values, completion: { (error) in
-            if let e = error
-            {
-                print("there was an issue regarding saving data to firestore ,\(e) " )
-            }
-            else
-            {
-                print("succesfully saved data")
-                self.dismiss(animated: true, completion: nil)
-            }
-        })
-    }
-    
-    @objc func handleLoginRegister(){
-        if loginRegisterSegmentedControl.selectedSegmentIndex == 0 {
-            handleLogin()
-        }else {
-            handleRegister()
-        }
-    }
-    
-    func handleLogin(){
-        guard let email = emailTextField.text , let password = passwordTextField.text  else { fatalError("email or password value is null") }
-        Auth.auth().signIn(withEmail: email, password: password) { (user, error) in
-            if error != nil {
-                print(error!)
-            } else {
-                // succesufully loged in with email and password
-                self.messagesController?.fetchUserAndSetupnavBarTitle()
-                self.dismiss(animated: true, completion: nil)
-            }
-        }
-    }
     
     //MARK: - loginRegisterSegmentControl constraints
     func setuploginRegisterSegmentedControl(){
