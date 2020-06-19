@@ -9,13 +9,15 @@
 import UIKit
 
 class User: NSObject {
+    var id : String?
     var name : String?
     var email : String?
     var profileImageURL : String?
     
-    init(username : String , useremail : String,profileImageUrl : String) {
+    init(username : String , useremail : String,profileImageUrl : String, id:String) {
         self.name = username
         self.email = useremail
         self.profileImageURL = profileImageUrl
+        self.id = id
     }
 }

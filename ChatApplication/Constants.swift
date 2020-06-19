@@ -18,4 +18,11 @@ struct K {
         static let uidField = "uid"
         static let profileUrl = "profileImageUrl"
     }
+    struct FstoreMessage {
+        static let collectionName = "messages"
+        static let textField = "text"
+        static let fromId = "fromId"
+        static let toId = "toId"
+        static let timestamp = "timestamp"
+    }
 }

@@ -14,14 +14,18 @@ class MessagesController: UITableViewController {
         // data declared
         let db = Firestore.firestore()
     
+    var messages = [Message]()
+    var messagesDictionary = [String:Message]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "logout", style: .plain, target: self, action: #selector(handleLogout))
         view.backgroundColor = .white
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(handleNewMessage))
         
+        tableView.register(UserCell.self, forCellReuseIdentifier: K.newMessageCellIdentifier)
         checkIfUserIsLoggedIn()
-        
+        observeMessages()
     }
     
     func checkIfUserIsLoggedIn()
@@ -93,15 +97,15 @@ class MessagesController: UITableViewController {
 
 
         self.navigationItem.titleView = titleView
-        titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
+        //titleView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
     
         
         
     }
     
-    @objc func showChatController(){
-        print("123")
-        let chatLogController = ChatLogController()
+    @objc func showChatControllerForUser(user : User){
+        let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
+        chatLogController.user = user
         navigationController?.pushViewController(chatLogController, animated: true)
     }
 
@@ -122,13 +126,66 @@ class MessagesController: UITableViewController {
     //MARK: - add button in navigation bar onclick function
     @objc func handleNewMessage(){
         let newMessageViewController = NewMessageController()
+        newMessageViewController.messageController = self
 //        newMessageViewController.modalPresentationStyle = .overFullScreen  // code for fullscrean view
         //navigationController?.pushViewController(newMessageViewController, animated: true)
         let nc = UINavigationController(rootViewController: newMessageViewController)
         nc.modalPresentationStyle = .fullScreen
         present(nc,animated : true , completion:nil)
     }
+    
+    func observeMessages() {
+
+        db.collection(K.FstoreMessage.collectionName).addSnapshotListener { (Snapshot, error) in
+            if error != nil{
+                print(error!.localizedDescription)
+                return
+            } else {
+                for doc in Snapshot!.documents{
+                    let data = doc.data()
+                    if let senderId = data[K.FstoreMessage.fromId] as? String ,
+                       let messageToBeSend = data[K.FstoreMessage.textField] as? String,
+                       let recieverId = data[K.FstoreMessage.toId] as? String,
+                        let messageSentTime = data[K.FstoreMessage.timestamp] as? NSNumber{
+                        let message = Message(senderId , messageToBeSend , messageSentTime, recieverId)
+                        //self.messages.append(message)
+                        if let toId  = message.toId {
+                            self.messagesDictionary[toId] = message
+                            
+                            self.messages = Array(self.messagesDictionary.values)
+    
+                            self.messages.sort { (message1, message2) -> Bool in
+                                return message1.timestamp!.intValue > message2.timestamp!.intValue
+                            }
+                        }
+
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: K.newMessageCellIdentifier, for: indexPath) as! UserCell
+        
+        let message = messages[indexPath.row]
+        cell.messages = message
+        
+        return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 72
+    }
 }
+
 
 extension UIColor {
     convenience init(r: CGFloat , g : CGFloat , b : CGFloat ){

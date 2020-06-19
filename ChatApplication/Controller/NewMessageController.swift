@@ -64,8 +64,8 @@ class NewMessageController: UITableViewController {
                 {
                     for doc in snapshotDocuments {
                         let data = doc.data()
-                        if let name = data[K.FStore.nameField] as? String ,let email = data[K.FStore.emailField] as? String , let profileImageurl = data[K.FStore.profileUrl] as? String{
-                            let user = User(username: name, useremail: email , profileImageUrl: profileImageurl)
+                        if let name = data[K.FStore.nameField] as? String ,let email = data[K.FStore.emailField] as? String , let profileImageurl = data[K.FStore.profileUrl] as? String  {
+                            let user = User(username: name, useremail: email , profileImageUrl: profileImageurl,id:doc.documentID)
                             self.users.append(user)
                             
                             DispatchQueue.main.async {
@@ -83,45 +83,16 @@ class NewMessageController: UITableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 72
     }
-}
-
-
-//MARK: - personalized .subtitle cell declare
-
- // Note :- use this class as a constructor to create a new cell with a type subtitle 
-
-class UserCell : UITableViewCell{
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        textLabel?.frame = CGRect(x: 64, y: textLabel!.frame.origin.y-2, width: textLabel!.frame.width, height: textLabel!.frame.height)
-        detailTextLabel?.frame = CGRect(x: 64, y: detailTextLabel!.frame.origin.y+2, width: detailTextLabel!.frame.width, height: detailTextLabel!.frame.height)
-    }
+    var messageController : MessagesController?
     
-    
-    let profileImageView: UIImageView = {
-     let imageview = UIImageView()
-        imageview.translatesAutoresizingMaskIntoConstraints = false
-        imageview.layer.cornerRadius = 24
-        imageview.layer.masksToBounds = true
-        imageview.contentMode = .scaleAspectFit
-     return imageview
-    }()
-    
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: .subtitle, reuseIdentifier : reuseIdentifier)
-        addSubview(profileImageView)
-        
-        //ios 13 constraints
-        //x,y,width & height anchor
-        profileImageView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8).isActive = true
-        profileImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 48).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 48).isActive = true
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        dismiss(animated: true) {
+            let user = self.users[indexPath.row]
+            print("dismiss controlled")
+            self.messageController?.showChatControllerForUser(user: user)
+            
+        }
     }
 }
+

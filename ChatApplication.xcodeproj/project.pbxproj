@@ -17,6 +17,8 @@
 		CC741C2B248BF3850023A4B0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC741C29248BF3850023A4B0 /* LaunchScreen.storyboard */; };
 		CC741C34248BFB140023A4B0 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC741C33248BFB140023A4B0 /* LoginController.swift */; };
 		CC797705248EAEED006ADDD2 /* NewMessageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC797704248EAEED006ADDD2 /* NewMessageController.swift */; };
+		CC81EA19249BEC8D00F8EA2B /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC81EA18249BEC8D00F8EA2B /* Message.swift */; };
+		CC81EA1C249C46C500F8EA2B /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC81EA1B249C46C500F8EA2B /* UserCell.swift */; };
 		CC861C882490337C00525073 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC861C872490337C00525073 /* User.swift */; };
 		CC861C8A249157CB00525073 /* LoginController+handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC861C89249157CB00525073 /* LoginController+handlers.swift */; };
 		CC914CC7249735CF00CCB922 /* ChatLogController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC914CC6249735CF00CCB922 /* ChatLogController.swift */; };
@@ -41,6 +43,8 @@
 		CC741C2C248BF3850023A4B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CC741C33248BFB140023A4B0 /* LoginController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 		CC797704248EAEED006ADDD2 /* NewMessageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMessageController.swift; sourceTree = "<group>"; };
+		CC81EA18249BEC8D00F8EA2B /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		CC81EA1B249C46C500F8EA2B /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
 		CC861C872490337C00525073 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		CC861C89249157CB00525073 /* LoginController+handlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginController+handlers.swift"; sourceTree = "<group>"; };
 		CC914CC6249735CF00CCB922 /* ChatLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
@@ -97,6 +101,7 @@
 		CC741C1A248BF3810023A4B0 /* ChatApplication */ = {
 			isa = PBXGroup;
 			children = (
+				CC81EA1A249C46A700F8EA2B /* View */,
 				CC3E90B72495105B005DF64D /* Helpers */,
 				CC861C862490334600525073 /* Model */,
 				CC741C32248BFAE30023A4B0 /* Controller */,
@@ -125,10 +130,19 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
+		CC81EA1A249C46A700F8EA2B /* View */ = {
+			isa = PBXGroup;
+			children = (
+				CC81EA1B249C46C500F8EA2B /* UserCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		CC861C862490334600525073 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				CC861C872490337C00525073 /* User.swift */,
+				CC81EA18249BEC8D00F8EA2B /* Message.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -259,6 +273,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CC741C26248BF3810023A4B0 /* ChatApplication.xcdatamodeld in Sources */,
+				CC81EA1C249C46C500F8EA2B /* UserCell.swift in Sources */,
 				CC741C20248BF3810023A4B0 /* MessagesController.swift in Sources */,
 				CC861C8A249157CB00525073 /* LoginController+handlers.swift in Sources */,
 				CC741C34248BFB140023A4B0 /* LoginController.swift in Sources */,
@@ -267,6 +282,7 @@
 				CC3E90B924951077005DF64D /* Extension.swift in Sources */,
 				CC861C882490337C00525073 /* User.swift in Sources */,
 				CC797705248EAEED006ADDD2 /* NewMessageController.swift in Sources */,
+				CC81EA19249BEC8D00F8EA2B /* Message.swift in Sources */,
 				CC741C1E248BF3810023A4B0 /* SceneDelegate.swift in Sources */,
 				CCA300F7248D4FD10032E7C7 /* Constants.swift in Sources */,
 			);
