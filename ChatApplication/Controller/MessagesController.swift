@@ -153,7 +153,8 @@ class MessagesController: UITableViewController {
                             self.messagesDictionary[toId] = message
                             
                             self.messages = Array(self.messagesDictionary.values)
-    
+                            
+                            //sorting chat as per time thety were sent 
                             self.messages.sort { (message1, message2) -> Bool in
                                 return message1.timestamp!.intValue > message2.timestamp!.intValue
                             }

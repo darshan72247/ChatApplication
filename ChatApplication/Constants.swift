@@ -24,5 +24,6 @@ struct K {
         static let fromId = "fromId"
         static let toId = "toId"
         static let timestamp = "timestamp"
+        static let userMessage = "user-messages"
     }
 }

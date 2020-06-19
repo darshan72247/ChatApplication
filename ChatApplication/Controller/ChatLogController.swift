@@ -88,8 +88,11 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate {
         guard let text = inputTextField.text else { return }
         guard let toOd = user?.id else { return }
         guard let fromId = Auth.auth().currentUser?.uid else { return}
-        let timestamp : NSNumber = NSNumber(value: Int(NSDate().timeIntervalSince1970))  
-        db.collection(K.FstoreMessage.collectionName).addDocument(data:  [
+        let timestamp : NSNumber = NSNumber(value: Int(NSDate().timeIntervalSince1970))
+        let ref = db.collection(K.FstoreMessage.collectionName)
+        let childRef = ref.document().documentID
+        
+        ref.document(childRef).setData([
             K.FstoreMessage.textField : text,
             K.FstoreMessage.toId:toOd ,
             K.FstoreMessage.fromId : fromId , 
@@ -100,9 +103,15 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate {
                 return
             } else {
                 print("text message saved into firebase !")
+
+                let userMessageRef = self.db.collection(K.FstoreMessage.collectionName).document(K.FstoreMessage.userMessage).collection(fromId)
+                self.db.collection(K.FstoreMessage.collectionName).document(K.FstoreMessage.userMessage).collection(fromId).document()
+                let messageId = childRef
+                userMessageRef.addDocument(data: [messageId:1])
             }
         }
-        print()
+        
+        
     }
     
     //MARK: - textfield delgate
