@@ -64,14 +64,15 @@ class NewMessageController: UITableViewController {
                 {
                     for doc in snapshotDocuments {
                         let data = doc.data()
-                        if let name = data[K.FStore.nameField] as? String ,let email = data[K.FStore.emailField] as? String , let profileImageurl = data[K.FStore.profileUrl] as? String  {
-                            let user = User(username: name, useremail: email , profileImageUrl: profileImageurl,id:doc.documentID)
+                        
+                        let user = User(dictionary: data)
+                        user.id = doc.documentID
                             self.users.append(user)
                             
                             DispatchQueue.main.async {
                                 self.tableView.reloadData()
                             }
-                        }
+//                        }
                     }
                 }
                 

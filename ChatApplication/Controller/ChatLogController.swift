@@ -9,13 +9,64 @@
 import UIKit
 import Firebase
 
-class ChatLogController: UICollectionViewController , UITextFieldDelegate {
+class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICollectionViewDelegateFlowLayout {
     
     var user : User?{
         didSet{
             navigationItem.title = user?.name
+            
+            obsereveMessages()
         }
     }
+    
+    var messages = [Message]()
+    
+    func obsereveMessages(){
+//        messages.removeAll()
+//        DispatchQueue.main.async {
+//            self.collectionView.reloadData()
+//        }
+
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        let userMessageRef = db.collection(K.FstoreMessage.collectionName).document(uid).collection("user-messages")
+        userMessageRef.addSnapshotListener { (snapshot, error) in
+            if error != nil {
+                print(error!.localizedDescription)
+                return
+            }
+            if let data = snapshot?.documents{
+                for values in data{
+                    //print(values.data())
+                    let messageData = values.data()
+                    for elements in messageData{
+                        let messageId = elements.key
+                        let messagesRef = self.db.collection(K.FstoreMessage.collectionName).document(messageId)
+                        messagesRef.addSnapshotListener { (snapshot, error) in
+                            if error != nil {
+                                print(error!.localizedDescription)
+                                return
+                            }
+                            if let data = snapshot?.data(){
+                                //print(data)
+                                let message = Message(dictionary: data)
+                               // print(message.text)
+                                if message.chatPartnerId() == self.user?.id{
+                                    self.messages.append(message)
+                                    
+                                    DispatchQueue.main.async {
+                                        self.collectionView.reloadData()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+    }
+    
     // data declared
     let db = Firestore.firestore()
     
@@ -30,14 +81,55 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-        
+        collectionView.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 58, right: 0)
+        collectionView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
+        collectionView.register(ChatMessageCell.self, forCellWithReuseIdentifier: K.newMessageCellIdentifier)
+        collectionView.alwaysBounceVertical = true 
         
         setupInputComponents()
     }
     
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.newMessageCellIdentifier, for: indexPath) as! ChatMessageCell
+        let message = messages[indexPath.row]
+        cell.textView.text = message.text
+        
+        cell.bubbleWidthAnchor?.constant = estimateFrameForText(text: message.text!).width + 32
+        
+        
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        var height:CGFloat = 80
+        
+        if let text = messages[indexPath.row].text{
+            height = estimateFrameForText(text: text).height + 20
+        }
+        
+        return CGSize(width: view.frame.width, height: height)
+    }
+    
+    private func estimateFrameForText(text : String) -> CGRect{
+        let size = CGSize(width: 200, height: 1000)
+        
+        let option = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
+        
+        
+        return NSString(string: text).boundingRect(with: size, options: option, attributes: [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 16)], context: nil)
+    }
     //MARK: - container box constraints
     func setupInputComponents(){
         let containerView = UIView()
+        containerView.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0) 
         containerView.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(containerView)
@@ -85,16 +177,17 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate {
     
     //MARK: - send button clicked function
     @objc func handleSend(){
+        
         guard let text = inputTextField.text else { return }
-        guard let toOd = user?.id else { return }
+        guard let toId = user?.id else { return }
         guard let fromId = Auth.auth().currentUser?.uid else { return}
         let timestamp : NSNumber = NSNumber(value: Int(NSDate().timeIntervalSince1970))
         let ref = db.collection(K.FstoreMessage.collectionName)
-        let childRef = ref.document().documentID
+        let messageId = ref.document().documentID
         
-        ref.document(childRef).setData([
+        ref.document(messageId).setData([
             K.FstoreMessage.textField : text,
-            K.FstoreMessage.toId:toOd ,
+            K.FstoreMessage.toId:toId ,
             K.FstoreMessage.fromId : fromId , 
             K.FstoreMessage.timestamp : timestamp
         ]) { (error) in
@@ -102,12 +195,15 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate {
                 print(error!.localizedDescription)
                 return
             } else {
+                self.inputTextField.text = nil
                 print("text message saved into firebase !")
 
-                let userMessageRef = self.db.collection(K.FstoreMessage.collectionName).document(K.FstoreMessage.userMessage).collection(fromId)
-                self.db.collection(K.FstoreMessage.collectionName).document(K.FstoreMessage.userMessage).collection(fromId).document()
-                let messageId = childRef
-                userMessageRef.addDocument(data: [messageId:1])
+                //saving data with refrence for current user
+                self.db.collection(K.FstoreMessage.collectionName).document(fromId).collection(K.FstoreMessage.userMessage).document(toId).setData([messageId : 1], merge: true)
+                
+                // saving data for recipient user
+                self.db.collection(K.FstoreMessage.collectionName).document(toId).collection(K.FstoreMessage.userMessage).document(fromId).setData([messageId : 1],merge: true)
+                
             }
         }
         

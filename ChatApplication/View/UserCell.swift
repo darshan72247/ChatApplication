@@ -20,22 +20,7 @@ class UserCell : UITableViewCell{
     
     var messages : Message?{
         didSet{
-            if let toId = messages?.toId{
-                db.collection(K.FStore.collectionName).document(toId).getDocument { (snapshot, error) in
-                    if error != nil {
-                        print(error!.localizedDescription)
-                        return
-                    } else {
-                        let data = snapshot?.data()
-                        guard let name = data?[K.FStore.nameField] as? String else {return}
-                        self.textLabel?.text = name
-                        if let profileImageUrl = data?[K.FStore.profileUrl] as? String{
-                            self.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
-                        }
-                    }
-                }
-                
-            }
+                   setupNameAndProfileImage()
             //        cell.textLabel?.text = messages[indexPath.row].formId
             detailTextLabel?.text = messages?.text
             if let second = messages?.timestamp?.doubleValue{
@@ -48,7 +33,28 @@ class UserCell : UITableViewCell{
             
         }
     }
-    
+    private func setupNameAndProfileImage(){
+        
+        
+        
+        
+        if let id = messages?.chatPartnerId(){
+            db.collection(K.FStore.collectionName).document(id).getDocument { (snapshot, error) in
+                if error != nil {
+                    print(error!.localizedDescription)
+                    return
+                } else {
+                    let data = snapshot?.data()
+                    guard let name = data?[K.FStore.nameField] as? String else {return}
+                    self.textLabel?.text = name
+                    if let profileImageUrl = data?[K.FStore.profileUrl] as? String{
+                        self.profileImageView.loadImageUsingCacheWithUrlString(urlString: profileImageUrl)
+                    }
+                }
+            }
+            
+        }
+    }
     override func layoutSubviews() {
         super.layoutSubviews()
         textLabel?.frame = CGRect(x: 64, y: textLabel!.frame.origin.y-2, width: textLabel!.frame.width, height: textLabel!.frame.height)

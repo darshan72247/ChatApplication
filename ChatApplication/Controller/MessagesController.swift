@@ -25,7 +25,57 @@ class MessagesController: UITableViewController {
         
         tableView.register(UserCell.self, forCellReuseIdentifier: K.newMessageCellIdentifier)
         checkIfUserIsLoggedIn()
-        observeMessages()
+        //observeMessages()
+        
+    }
+    
+    func observeUserMessages()
+    {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let ref = db.collection(K.FstoreMessage.collectionName).document(uid).collection(K.FstoreMessage.userMessage)
+        ref.addSnapshotListener { (querySnapshot, error) in
+            if error != nil {
+                print(error!.localizedDescription)
+                return
+            }
+            if let querySnapshot = querySnapshot?.documents{
+                for snapshot in querySnapshot{
+                    let data = snapshot.data()
+                    //print(data.keys)
+                    for elements in data{
+                        let messageId = elements.key
+                        let messagesRef = self.db.collection(K.FstoreMessage.collectionName).document(messageId)
+                        messagesRef.addSnapshotListener { (snapshot1, error) in
+                            if error != nil {
+                                print(error!.localizedDescription)
+                                return
+                            }
+                            //print(snapshot1?.data())
+                            if let messageData = snapshot1?.data(){
+                                let message = Message(dictionary: messageData)
+                                if let chatPartnerId  = message.chatPartnerId(){
+                                    self.messagesDictionary[chatPartnerId] = message
+                                    
+                                    self.messages = Array(self.messagesDictionary.values)
+                                    
+                                    //sorting chat as per time thety were sent
+                                    self.messages.sort { (message1, message2) -> Bool in
+                                        return message1.timestamp!.intValue > message2.timestamp!.intValue
+                                    }
+                                }
+
+                                DispatchQueue.main.async {
+                                    self.tableView.reloadData()
+                                }
+
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+//       demo peice to retive data  self.db.collection(K.FstoreMessage.collectionName).document(fromId).collection(K.FstoreMessage.userMessage).document(toId).setData([messageId : 1], merge: true)
     }
     
     func checkIfUserIsLoggedIn()
@@ -56,6 +106,11 @@ class MessagesController: UITableViewController {
     }
     
     func setupNavBarWithUser(data : [String : Any]){
+        messages.removeAll()
+        messagesDictionary.removeAll()
+        tableView.reloadData()
+        observeUserMessages()
+        
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
         //titleView.backgroundColor = UIColor.red
@@ -143,11 +198,7 @@ class MessagesController: UITableViewController {
             } else {
                 for doc in Snapshot!.documents{
                     let data = doc.data()
-                    if let senderId = data[K.FstoreMessage.fromId] as? String ,
-                       let messageToBeSend = data[K.FstoreMessage.textField] as? String,
-                       let recieverId = data[K.FstoreMessage.toId] as? String,
-                        let messageSentTime = data[K.FstoreMessage.timestamp] as? NSNumber{
-                        let message = Message(senderId , messageToBeSend , messageSentTime, recieverId)
+                        let message = Message(dictionary: data)
                         //self.messages.append(message)
                         if let toId  = message.toId {
                             self.messagesDictionary[toId] = message
@@ -163,7 +214,7 @@ class MessagesController: UITableViewController {
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                         }
-                    }
+                    
                 }
             }
         }
@@ -184,6 +235,29 @@ class MessagesController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 72
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let message = messages[indexPath.row]
+//        print(message.text)
+        guard let chatPartnerId = message.chatPartnerId() else {
+            return
+        }
+        let ref = db.collection(K.FStore.collectionName).document(chatPartnerId)
+        ref.addSnapshotListener { (snapshot, error) in
+            if error != nil {
+                print(error!.localizedDescription)
+                return
+            }
+            if let data = snapshot?.data(){
+                print(data)
+                let user = User(dictionary: data)
+                user.id = chatPartnerId
+                self.showChatControllerForUser(user: user)
+                
+            }
+        }
+
     }
 }
 
