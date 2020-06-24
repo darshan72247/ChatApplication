@@ -25,10 +25,10 @@ class MessagesController: UITableViewController {
         
         tableView.register(UserCell.self, forCellReuseIdentifier: K.newMessageCellIdentifier)
         checkIfUserIsLoggedIn()
-        //observeMessages()
+        
         
     }
-    
+    var timer: Timer?
     func observeUserMessages()
     {
         guard let uid = Auth.auth().currentUser?.uid else { return }
@@ -63,10 +63,11 @@ class MessagesController: UITableViewController {
                                         return message1.timestamp!.intValue > message2.timestamp!.intValue
                                     }
                                 }
-
-                                DispatchQueue.main.async {
-                                    self.tableView.reloadData()
-                                }
+                                    
+                                self.timer?.invalidate()
+                                //we  just canccled our timer
+                                self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleTimer), userInfo: nil, repeats: false)
+                                // schelude a table reload in 0.1 sec 
 
                             }
                         }
@@ -76,6 +77,12 @@ class MessagesController: UITableViewController {
             }
         }
 //       demo peice to retive data  self.db.collection(K.FstoreMessage.collectionName).document(fromId).collection(K.FstoreMessage.userMessage).document(toId).setData([messageId : 1], merge: true)
+    }
+    
+    @objc func handleTimer (){
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     func checkIfUserIsLoggedIn()
@@ -189,36 +196,7 @@ class MessagesController: UITableViewController {
         present(nc,animated : true , completion:nil)
     }
     
-    func observeMessages() {
-
-        db.collection(K.FstoreMessage.collectionName).addSnapshotListener { (Snapshot, error) in
-            if error != nil{
-                print(error!.localizedDescription)
-                return
-            } else {
-                for doc in Snapshot!.documents{
-                    let data = doc.data()
-                        let message = Message(dictionary: data)
-                        //self.messages.append(message)
-                        if let toId  = message.toId {
-                            self.messagesDictionary[toId] = message
-                            
-                            self.messages = Array(self.messagesDictionary.values)
-                            
-                            //sorting chat as per time thety were sent 
-                            self.messages.sort { (message1, message2) -> Bool in
-                                return message1.timestamp!.intValue > message2.timestamp!.intValue
-                            }
-                        }
-
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                        }
-                    
-                }
-            }
-        }
-    }
+    
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
