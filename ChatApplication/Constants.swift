@@ -21,6 +21,10 @@ struct K {
     struct FstoreMessage {
         static let collectionName = "messages"
         static let textField = "text"
+        static let imageUrlField = "imageUrl"
+        static let videoUrlField = "VideoUrl"
+        static let imageWidth = "imageWidth"
+        static let imageHeigt = " imageHeight"
         static let fromId = "fromId"
         static let toId = "toId"
         static let timestamp = "timestamp"

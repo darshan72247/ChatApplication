@@ -10,6 +10,8 @@ import UIKit
 
 class ChatMessageCell: UICollectionViewCell {
     
+    var ChatLogController : ChatLogController?
+    
     let textView : UITextView = {
         let tv = UITextView()
         tv.text = "Sample text"
@@ -34,14 +36,33 @@ class ChatMessageCell: UICollectionViewCell {
     
     
     let profileImageView : UIImageView = {
-       let imageView = UIImageView()
-        imageView.image = UIImage(named: "logo")
+        let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = 16
         imageView.layer.masksToBounds = true
         imageView.contentMode = .scaleAspectFill
         return imageView
     }()
+    
+    
+    lazy var   messageImageView:UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = 16
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleZoomTap)))
+        //imageView.backgroundColor = #colorLiteral(red: 0.9254902005, green: 0.2352941185, blue: 0.1019607857, alpha: 1) // 
+        return imageView
+    }()
+    
+    @objc private func handleZoomTap(tapGesture : UITapGestureRecognizer){
+        //print("tap on image in message ")
+        if let imageView = tapGesture.view as? UIImageView {
+            self.ChatLogController?.performZoomInStartingForImageView(startingImageView: imageView)
+        }
+    }
     
     var bubbleWidthAnchor : NSLayoutConstraint?
     var bubbleViewRightAnchor : NSLayoutConstraint?
@@ -54,6 +75,13 @@ class ChatMessageCell: UICollectionViewCell {
         addSubview(bubbleView)
         addSubview(textView)
         addSubview(profileImageView)
+        bubbleView.addSubview(messageImageView)
+        
+        //x,y,w,h constraints for messageImage view
+        messageImageView.leftAnchor.constraint(equalTo: bubbleView.leftAnchor).isActive = true
+        messageImageView.topAnchor.constraint(equalTo: bubbleView.topAnchor).isActive = true
+        messageImageView.widthAnchor.constraint(equalTo: bubbleView.widthAnchor).isActive = true
+        messageImageView.heightAnchor.constraint(equalTo: bubbleView.heightAnchor).isActive = true
         
         //x,y,w,h constraints bubble view
         

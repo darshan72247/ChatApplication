@@ -29,8 +29,8 @@ extension LoginController : UIImagePickerControllerDelegate , UINavigationContro
     
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        guard let image = info[.originalImage] else {return}
-        print(image)
+//        guard let image = info[.originalImage] else {return}
+//        //print(image)
         
         var selectedImageFromPicker:UIImage?
         
@@ -77,7 +77,7 @@ extension LoginController : UIImagePickerControllerDelegate , UINavigationContro
                             if error != nil{
                                 print(error!)
                             } else {
-                                print("Url Downloaded")
+                                //print("Url Downloaded")
                                 guard let imageUrl = url?.absoluteString else {return}
                                 let values = [ K.FStore.nameField:name ,K.FStore.emailField:email ,K.FStore.profileUrl: imageUrl] as [String : Any]
                                 self.registerUserIntoDatabaseWithUID(uid: uid, values: values)

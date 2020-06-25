@@ -44,39 +44,53 @@ class MessagesController: UITableViewController {
                     //print(data.keys)
                     for elements in data{
                         let messageId = elements.key
-                        let messagesRef = self.db.collection(K.FstoreMessage.collectionName).document(messageId)
-                        messagesRef.addSnapshotListener { (snapshot1, error) in
-                            if error != nil {
-                                print(error!.localizedDescription)
-                                return
-                            }
-                            //print(snapshot1?.data())
-                            if let messageData = snapshot1?.data(){
-                                let message = Message(dictionary: messageData)
-                                if let chatPartnerId  = message.chatPartnerId(){
-                                    self.messagesDictionary[chatPartnerId] = message
-                                    
-                                    self.messages = Array(self.messagesDictionary.values)
-                                    
-                                    //sorting chat as per time thety were sent
-                                    self.messages.sort { (message1, message2) -> Bool in
-                                        return message1.timestamp!.intValue > message2.timestamp!.intValue
-                                    }
-                                }
-                                    
-                                self.timer?.invalidate()
-                                //we  just canccled our timer
-                                self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleTimer), userInfo: nil, repeats: false)
-                                // schelude a table reload in 0.1 sec 
-
-                            }
-                        }
+                        self.fetchMessageWithMessageId(with: messageId)
                     }
-                    
                 }
             }
         }
-//       demo peice to retive data  self.db.collection(K.FstoreMessage.collectionName).document(fromId).collection(K.FstoreMessage.userMessage).document(toId).setData([messageId : 1], merge: true)
+    }
+    
+    
+    //MARK: - fetch message for specific user
+    private func fetchMessageWithMessageId(with messageId : String){
+        let messagesRef = self.db.collection(K.FstoreMessage.collectionName).document(messageId)
+        messagesRef.addSnapshotListener { (snapshot1, error) in
+            if error != nil {
+                print(error!.localizedDescription)
+                return
+            }
+            //print(snapshot1?.data())
+            print("data obsereve to load mainscreen")
+            if let messageData = snapshot1?.data(){
+                let message = Message(dictionary: messageData)
+                
+                if let chatPartnerId  = message.chatPartnerId(){
+                    self.messagesDictionary[chatPartnerId] = message
+                }
+                   
+                
+                self.attemptReloadOfTable()
+                
+
+            }
+        }
+    }
+    
+    //MARK: - reload table and save memmory leak
+    
+    private func attemptReloadOfTable(){
+        self.messages = Array(self.messagesDictionary.values)
+        
+        //sorting chat as per time thety were sent
+        self.messages.sort { (message1, message2) -> Bool in
+            return message1.timestamp!.intValue > message2.timestamp!.intValue
+        }
+        
+        self.timer?.invalidate()
+        //we  just canccled our timer
+        self.timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.handleTimer), userInfo: nil, repeats: false)
+        // schelude a table reload in 0.1 sec
     }
     
     @objc func handleTimer (){
