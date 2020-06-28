@@ -23,7 +23,7 @@ extension LoginController : UIImagePickerControllerDelegate , UINavigationContro
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        print("cancel ")
+        //print("cancel ")
         dismiss(animated: true, completion: nil)
     }
     
@@ -118,15 +118,91 @@ extension LoginController : UIImagePickerControllerDelegate , UINavigationContro
     }
     
     func handleLogin(){
+        
+        
         guard let email = emailTextField.text , let password = passwordTextField.text  else { fatalError("email or password value is null") }
         Auth.auth().signIn(withEmail: email, password: password) { (user, error) in
             if error != nil {
-                print(error!)
+                print(error!.localizedDescription)
+                
+                
+                let errorString : String = error!.localizedDescription
+                if errorString == "There is no user record corresponding to this identifier. The user may have been deleted."{
+                    //alert show the user id is invalid and clear the e-mail and password textfield
+                    let alert = UIAlertController(title: "Invalid E-mail OR No such user exsist", message: "", preferredStyle: .alert)
+                    let action = UIAlertAction(title: "OK", style: .default) { (action) in
+                        self.emailTextField.text = ""
+                        self.passwordTextField.text = ""
+                    }
+                    alert.addAction(action)
+                    self.present(alert,animated: true,completion: nil)
+                } else if errorString == "The password is invalid or the user does not have a password."{
+                    //alert show password is invalid and clear the password text field box
+                    let alert = UIAlertController(title: "Invalid Password", message: "", preferredStyle:.alert)
+                    let action = UIAlertAction(title: "Re-attempt", style: .default) { (action) in
+                        self.passwordTextField.text = ""
+                    }
+                    alert.addAction(action)
+                    self.present(alert,animated: true,completion: nil)
+                } else if errorString == "The email address is badly formatted."{
+                    //alert show email is invalid and clear the password text field box
+                    let alert = UIAlertController(title: "Invalid E-mail", message: "", preferredStyle:.alert)
+                    let action = UIAlertAction(title: "Re-attempt", style: .default) { (action) in
+                        self.emailTextField.text = ""
+                    }
+                    alert.addAction(action)
+                    self.present(alert,animated: true,completion: nil)
+                }
+                
             } else {
                 // succesufully loged in with email and password
-                self.messagesController?.fetchUserAndSetupnavBarTitle()
-                self.dismiss(animated: true, completion: nil)
+//                let activityView = UIActivityIndicatorView(style: .large)
+//                activityView.center = self.view.center
+//                activityView.startAnimating()
+//                self.view.addSubview(activityView)
+                
+                
+//                //set image of laoding
+//                let loadingImage = UIImageView()
+//                loadingImage.image = UIImage(named: "loading")
+//                loadingImage.translatesAutoresizingMaskIntoConstraints = false
+//                loadingImage.layer.cornerRadius = 20
+//                loadingImage.layer.masksToBounds = true
+//                self.view.addSubview(loadingImage)
+//
+//
+//
+//                loadingImage.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+//                loadingImage.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+//                loadingImage.heightAnchor.constraint(equalToConstant: 200).isActive = true
+//                loadingImage.widthAnchor.constraint(equalToConstant: 200).isActive = true
+//
+
+                // loading bar
+                let loadingBar = UIProgressView(progressViewStyle: .default)
+                loadingBar.translatesAutoresizingMaskIntoConstraints = false
+                loadingBar.progress = 0
+                loadingBar.setProgress(0, animated: false)
+                loadingBar.setProgress(1, animated: true)
+                self.view.addSubview(loadingBar)
+                
+                //x,y,w,h
+                loadingBar.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+                loadingBar.topAnchor.constraint(equalTo: self.loginRegisterButton.bottomAnchor,constant: 20).isActive = true
+                loadingBar.widthAnchor.constraint(equalToConstant: 350).isActive = true
+                loadingBar.heightAnchor.constraint(equalToConstant: 3).isActive = true
+                
+                
+                
+                _ = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.handleLoginWithLoading), userInfo: nil, repeats: false)
             }
         }
     }
+    
+    //MARK: - loading timer after login screen
+    @ objc func handleLoginWithLoading(){
+        self.messagesController?.fetchUserAndSetupnavBarTitle()
+        self.dismiss(animated: true, completion: nil)
+    }
+    
 }

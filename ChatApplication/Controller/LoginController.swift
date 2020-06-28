@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-class LoginController: UIViewController {
+  class LoginController: UIViewController, UITextFieldDelegate {
     
     var messagesController : MessagesController?
     // data declared
@@ -28,12 +28,14 @@ class LoginController: UIViewController {
     }()
     //MARK: - register button closure
     
-    lazy var loginRegiterButton: UIButton = {
+    lazy var loginRegisterButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Register", for: .normal)
-        button.backgroundColor = #colorLiteral(red: 0.9647058824, green: 0.8039215686, blue: 0.3803921569, alpha: 1)
+//        button.backgroundColor = #colorLiteral(red: 0.9647058824, green: 0.8039215686, blue: 0.3803921569, alpha: 1)
+        button.backgroundColor = #colorLiteral(red: 0.9968226552, green: 0.8864033818, blue: 0.4593802691, alpha: 1)
         button.layer.cornerRadius = 17
-        button.setTitleColor(#colorLiteral(red: 0.395519495, green: 0.2288445532, blue: 1, alpha: 1), for: .normal)
+//        button.setTitleColor(#colorLiteral(red: 0.395519495, green: 0.2288445532, blue: 1, alpha: 1), for: .normal)
+        button.setTitleColor(#colorLiteral(red: 0.1131096557, green: 0.6524511576, blue: 0.8918609023, alpha: 1), for: .normal)
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 17)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(handleLoginRegister), for: .touchUpInside)
@@ -117,11 +119,11 @@ class LoginController: UIViewController {
     //MARK: - view did load
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        view.backgroundColor = UIColor(patternImage: UIImage(named: "background")!)
         // Do any additional setup after loading the view.
         
         view.addSubview(inputContainerView)
-        view.addSubview(loginRegiterButton)
+        view.addSubview(loginRegisterButton)
         view.addSubview(profileImageView)
         view.addSubview(loginRegisterSegmentedControl)
         
@@ -202,10 +204,10 @@ class LoginController: UIViewController {
     //MARK: - login buttton constraints
     func setupLoginRegisterButton(){
         // need x , y , width , height constraints
-        loginRegiterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        loginRegiterButton.topAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: 12 ).isActive = true
-        loginRegiterButton.widthAnchor.constraint(equalTo: inputContainerView.widthAnchor).isActive = true
-        loginRegiterButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        loginRegisterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        loginRegisterButton.topAnchor.constraint(equalTo: inputContainerView.bottomAnchor, constant: 12 ).isActive = true
+        loginRegisterButton.widthAnchor.constraint(equalTo: inputContainerView.widthAnchor).isActive = true
+        loginRegisterButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
     }
     
@@ -213,9 +215,9 @@ class LoginController: UIViewController {
     func setupProfileImageView(){
         // need x , y , width , height constraints
         profileImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        profileImageView.bottomAnchor.constraint(equalTo: loginRegisterSegmentedControl.topAnchor,constant: -12).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 250).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 250).isActive = true
+        profileImageView.bottomAnchor.constraint(equalTo: loginRegisterSegmentedControl.topAnchor,constant: -24).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
         
     }
     
@@ -234,7 +236,7 @@ class LoginController: UIViewController {
     
     @objc func handleLoginRegisterChange(){
         let title = loginRegisterSegmentedControl.titleForSegment(at: loginRegisterSegmentedControl.selectedSegmentIndex)
-        loginRegiterButton.setTitle(title, for: .normal)
+        loginRegisterButton.setTitle(title, for: .normal)
         
         // change the height of inpitcontainer view but how ??
         inputsConatinerViewHeightAnchor?.constant = loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 100 : 150

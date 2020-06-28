@@ -7,10 +7,54 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ChatMessageCell: UICollectionViewCell {
     
+    var message : Message?
     var ChatLogController : ChatLogController?
+    let activityIndicatorView : UIActivityIndicatorView = {
+        let aiv = UIActivityIndicatorView(style: .large)
+        aiv.translatesAutoresizingMaskIntoConstraints = false
+        aiv.hidesWhenStopped = true
+        return aiv
+    }()
+    
+    lazy var  playButton : UIButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(named: "play")
+        button.setImage(image, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(handlePlay), for: .touchUpInside)
+        return button
+    }()
+    
+    var playerLayer : AVPlayerLayer?
+    var player : AVPlayer?
+    
+    @objc func handlePlay(){
+        if let videoUrlString = message?.videoUrl, let url = NSURL(string: videoUrlString){
+            player = AVPlayer(url: url as URL )
+            
+            playerLayer = AVPlayerLayer(player: player)
+            playerLayer?.frame = bubbleView.bounds
+            bubbleView.layer.addSublayer(playerLayer!)
+            player?.play()
+            
+            activityIndicatorView.startAnimating()
+            playButton.isHidden = true
+            print("attemting to play video")
+        }
+    }
+    
+    // below function helps to resuse our cell and not making changes while scrolling
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        playerLayer?.removeFromSuperlayer()
+        player?.pause()
+        activityIndicatorView.stopAnimating()
+    }
+    
     
     let textView : UITextView = {
         let tv = UITextView()
@@ -58,6 +102,9 @@ class ChatMessageCell: UICollectionViewCell {
     }()
     
     @objc private func handleZoomTap(tapGesture : UITapGestureRecognizer){
+        if message?.videoUrl != nil {
+            return
+        }
         //print("tap on image in message ")
         if let imageView = tapGesture.view as? UIImageView {
             self.ChatLogController?.performZoomInStartingForImageView(startingImageView: imageView)
@@ -83,6 +130,20 @@ class ChatMessageCell: UICollectionViewCell {
         messageImageView.widthAnchor.constraint(equalTo: bubbleView.widthAnchor).isActive = true
         messageImageView.heightAnchor.constraint(equalTo: bubbleView.heightAnchor).isActive = true
         
+        bubbleView.addSubview(playButton)
+        //x,y,w,h
+        playButton.centerXAnchor.constraint(equalTo: messageImageView.centerXAnchor).isActive = true
+        playButton.centerYAnchor.constraint(equalTo: messageImageView.centerYAnchor).isActive = true
+        playButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        playButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        bubbleView.addSubview(activityIndicatorView)
+        //x,y,w,h
+        activityIndicatorView.centerXAnchor.constraint(equalTo: messageImageView.centerXAnchor).isActive = true
+        activityIndicatorView.centerYAnchor.constraint(equalTo: messageImageView.centerYAnchor).isActive = true
+        activityIndicatorView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        activityIndicatorView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
         //x,y,w,h constraints bubble view
         
         bubbleViewRightAnchor = bubbleView.rightAnchor.constraint(equalTo: self.rightAnchor,constant: -8)
@@ -94,6 +155,8 @@ class ChatMessageCell: UICollectionViewCell {
         bubbleWidthAnchor = bubbleView.widthAnchor.constraint(equalToConstant: 200)
         bubbleWidthAnchor?.isActive = true
         bubbleView.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true
+        
+        
         
         
         //x,y,w,h constraints textview

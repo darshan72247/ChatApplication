@@ -40,7 +40,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
             self.messages.removeAll()
             
             if let data = snapshot?.data(){
-                print(data)
+                //print(data)
                 for elements in data{
                     let messageId = elements.key
                     let messagesRef = self.db.collection(K.FstoreMessage.collectionName).document(messageId)
@@ -53,7 +53,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
                         if let data = snapshot?.data(){
                             let message = Message(dictionary: data)
                             //print(message)
-                            print("We fetch a message from the firebase and we need to decide whether or not to filter out",message.text)
+                            //print("We fetch a message from the firebase and we need to decide whether or not to filter out",message.text)
                             self.messages.append(message)
                             self.messages.sort { (m1, m2) -> Bool in
                                 m1.timestamp!.intValue < m2.timestamp!.intValue
@@ -75,13 +75,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     // data declared
     let db = Firestore.firestore()
     
-    lazy var  inputTextField : UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Enter message..."
-        textField.delegate = self
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        return textField
-    }()
+   
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,60 +107,15 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     }
     
     
-    lazy var inputContainerView : UIView = {
-        let containerView = UIView()
-        containerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50)
-        containerView.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+    lazy var inputContainerView : ChatInputContainerView = {
+        let chatInputContainerView = ChatInputContainerView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50))
+        chatInputContainerView.chatLogController = self
+        return chatInputContainerView
         
-        let uploadImageView = UIImageView()
-        uploadImageView.isUserInteractionEnabled = true
-        uploadImageView.image = UIImage(named: "image")
-        containerView.addSubview(uploadImageView)
-        uploadImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleUploadTap)))
-        uploadImageView.translatesAutoresizingMaskIntoConstraints = false
-        //x,y,w,h
-        uploadImageView.leftAnchor.constraint(equalTo : containerView.leftAnchor ,constant: 8).isActive = true
-        uploadImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
-        uploadImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        uploadImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
-        
-        let sendButton = UIButton(type: .system)
-        sendButton.setTitle("Send", for: .normal)
-        sendButton.addTarget(self, action: #selector(handleSend), for: .touchUpInside)
-        sendButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        containerView.addSubview(sendButton)
-        
-        //x,y,w,h
-        sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
-        sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
-        sendButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        sendButton.heightAnchor.constraint(equalTo:containerView.heightAnchor).isActive = true
-        
-        containerView.addSubview(inputTextField)
-        
-        //x,y,w,h
-        inputTextField.leftAnchor.constraint(equalTo: uploadImageView.rightAnchor,constant: 8).isActive = true
-        inputTextField.centerYAnchor.constraint(equalTo:containerView.centerYAnchor).isActive = true
-        inputTextField.rightAnchor.constraint(equalTo: sendButton.leftAnchor).isActive = true
-        inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
-        
-        let separatorLineView = UIView()
-        separatorLineView.backgroundColor = UIColor(r: 220, g: 220, b: 220)
-        separatorLineView.translatesAutoresizingMaskIntoConstraints = false
-        
-        containerView.addSubview(separatorLineView)
-        
-        //x,y,w,h
-        separatorLineView.leftAnchor.constraint(equalTo:containerView.leftAnchor).isActive = true
-        separatorLineView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
-        separatorLineView.widthAnchor.constraint(equalTo: containerView.widthAnchor).isActive = true
-        separatorLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        
-        
-        
-        
-        return containerView
+//        let containerView = UIView()
+//        containerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 50)
+//        containerView.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+//        return containerView
     }()
     
     @objc func handleUploadTap(){
@@ -192,7 +141,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     }
     
     private func handleVideoSelectefForUrl(with videoFileUrl : URL){
-        print("here is the file url :- ",videoFileUrl)
+        //print("here is the file url :- ",videoFileUrl)
         
         let videoName = NSUUID().uuidString + ".mov"
         let videoStorageRef = storage.reference().child("message_movies").child(videoName)
@@ -227,16 +176,30 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
                     }
                 }
             }
+            
+            
+         
             uploadtask.observe(.progress) { (snapshot) in
+                
                 self.navigationItem.title = "Video Uploading ...."
-                //                if let progesstime = snapshot.progress{
-                //                    //print(Int(progesstime.completedUnitCount)) printing values
-                //                    // from above values can show the progess bar
-                //
-                //                }
+                
+                
+                let alert = UIAlertController(title: "Video Uploading", message: "", preferredStyle: .alert)
+                
+                let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+                 alert.addAction(action)
+                
+                self.present(alert, animated: true, completion: nil)
+//                                if let progesstime = snapshot.progress {
+//                                    //print(Int(progesstime.completedUnitCount)) printing values
+//                                    // from above values can show the progess bar
+////                                    let loading = UIProgressView(frame: CGRect(x: 30, y: 50, width: 2, height: 5))
+////                                    loading.setProgress(Float(progesstime as! Int), animated: true)
+//                                }
             }
             uploadtask.observe(.success) { (snapshot) in
                 self.navigationItem.title = self.user?.name
+                
             }
         } catch {
             print(error)
@@ -375,6 +338,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         cell.ChatLogController = self
         
         let message = messages[indexPath.row]
+        cell.message = message
         cell.textView.text = message.text
         
         setupCell(cell: cell, message: message )
@@ -386,7 +350,14 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
             cell.bubbleWidthAnchor?.constant = 200
             cell.textView.isHidden = true
         }
-        
+//
+//        if message.videoUrl != nil {
+//            cell.playButton.isHidden = false
+//        } else {
+//            cell.playButton.isHidden = true
+//        }
+         
+        cell.playButton.isHidden = message.videoUrl == nil
         
         
         return cell
@@ -458,7 +429,8 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
     
     //MARK: - send button clicked function
     @objc func handleSend(){
-        guard let text = inputTextField.text else { return }
+        
+        guard let text = inputContainerView.inputTextField.text else { return }
         let properties = [K.FstoreMessage.textField : text]
         sendMessageWithProperties(properties: properties)
     }
@@ -495,7 +467,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
                 print(error!.localizedDescription)
                 return
             } else {
-                self.inputTextField.text = nil
+                self.inputContainerView.inputTextField.text = nil
                 print("text message saved into firebase !")
                 
                 //saving data with refrence for current user
@@ -510,11 +482,7 @@ class ChatLogController: UICollectionViewController , UITextFieldDelegate , UICo
         
     }
     
-    //MARK: - textfield delgate
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        handleSend()
-        return true
-    }
+   
     
     //MARK: - my custom zooming logic
     

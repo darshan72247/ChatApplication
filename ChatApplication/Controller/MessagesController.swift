@@ -26,8 +26,30 @@ class MessagesController: UITableViewController {
         tableView.register(UserCell.self, forCellReuseIdentifier: K.newMessageCellIdentifier)
         checkIfUserIsLoggedIn()
         
+        tableView.allowsMultipleSelectionDuringEditing = true
         
     }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        //print(indexPath.row)
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let message = self.messages[indexPath.row]
+        if let chatPartnerId = message.chatPartnerId(){
+            db.collection(K.FstoreMessage.collectionName).document(uid).collection("user-messages").document(chatPartnerId).delete { (error) in
+                if error != nil {
+                    print(error!.localizedDescription)
+                }
+                self.messagesDictionary.removeValue(forKey: chatPartnerId)
+                self.attemptReloadOfTable()
+            }
+        }
+    }
+    
+    
     var timer: Timer?
     func observeUserMessages()
     {
@@ -61,7 +83,7 @@ class MessagesController: UITableViewController {
                 return
             }
             //print(snapshot1?.data())
-            print("data obsereve to load mainscreen")
+            //print("data obsereve to load mainscreen")
             if let messageData = snapshot1?.data(){
                 let message = Message(dictionary: messageData)
                 
@@ -242,7 +264,7 @@ class MessagesController: UITableViewController {
                 return
             }
             if let data = snapshot?.data(){
-                print(data)
+               // print(data)
                 let user = User(dictionary: data)
                 user.id = chatPartnerId
                 self.showChatControllerForUser(user: user)
