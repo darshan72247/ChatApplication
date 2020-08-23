@@ -73,7 +73,6 @@
     <li>pod 'Firebase/Database'</li>
     <li>pod 'Firebase/Auth'</li>
     <li>pod 'Firebase/Storage'</li>
-    <li>pod 'lottie-ios'</li>
   </ol>
  </p> 
  </li>
