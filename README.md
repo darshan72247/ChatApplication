@@ -1,6 +1,6 @@
 <h1> ChatApplication</h1>
 <hr height= 5px>
-<h2>OverView</h2>
+<h2>🔖&nbsp;OverView</h2>
 <ul>
  <li>
    <p>This application use google cloud firebase to save chat message , photos and videos of the users .
@@ -8,7 +8,7 @@
  </li>
 </ul>
 <hr>
-<h2>Login & Main Screen ScreenShot</h2>
+<h2>&nbsp;📱&nbsp;&nbsp;Login & Main Screen ScreenShot</h2>
 <table cellspacing = 5px>
  <tr>
   <td><h4>Login Screen</h4></td>
@@ -49,7 +49,22 @@
  </tr>
  </table>
  <hr>
- <h2>PodFiles Needed to Run this Application</h2>
+ <h2>&nbsp;🗨&nbsp;&nbsp;Chat Features</h2>
+ <table>
+ <tr>
+  <td colspan = 2><c>
+   🔺 Can send Images<br>
+   💠 Video can sent to any user.
+   </c>
+  </td>
+ </tr>
+ <tr>
+  <td> <img src = images/Simulator%20Screen%20Shot%20-%20iPhone%2011%20Pro%20-%202020-08-23%20at%2011.42.32.png height=400 width=195> </td>
+  <td> <img src = images/Simulator%20Screen%20Shot%20-%20iPhone%2011%20Pro%20-%202020-08-23%20at%2011.42.47.png height=400 width=195> </td>
+ </tr>
+ </table>
+ <hr>
+ <h2>&nbsp;📝&nbsp;&nbsp;PodFiles Needed to Run this Application</h2>
  <ul>
   <li>
   <p>To use this application you need to install the following pod file :-
@@ -63,6 +78,12 @@
  </p> 
  </li>
  </ul>
+ <hr>
+ <h2>&nbsp;✔&nbsp;Credits</h2>
+ <ul>
+ <li><img src= https://emojipedia-us.s3.amazonaws.com/content/2020/04/05/yt.png height = 25 width = 25>&nbsp; <a href=https://www.youtube.com/c/LetsBuildThatApp/videos>Lets Build that App</li>
+ </ul>
+ 
 
 
 
