@@ -54,7 +54,7 @@
  <tr>
   <td colspan = 2><c>
    🔺 Can send Images<br>
-   💠 Video can sent to any user.
+   💠 Video can be sent to any user.
    </c>
   </td>
  </tr>
